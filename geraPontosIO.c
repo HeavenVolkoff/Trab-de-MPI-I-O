@@ -138,7 +138,6 @@ int main(int argc, char** argv){
 	if(params[0] == INT){
 		MPI_Type_size(MPI_INT, &file_type_size);
 		if(rank == 0){
-			//MPI_File_set_view(saveFile, 0, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
 			MPI_File_seek(saveFile, 0, MPI_SEEK_SET);
 			//Escreve quantos números serão escritos no arquivo.
 			MPI_File_write(saveFile, &(params[1]), 1, MPI_INT, MPI_STATUS_IGNORE);
@@ -212,12 +211,6 @@ int main(int argc, char** argv){
 
 	// MPI_File_open(MPI_COMM_WORLD, "pontos.txt", MPI_MODE_RDONLY, MPI_INFO_NULL, &saveFile);
 	// if(rank == 0){
-	// 	offset = 2 * (params[1] / nProc); //Geramos params[1] pares de números.
-	// 	if(params[1] % nProc != 0){ //Ajusta o offset caso a divisão não seja exata.
-	// 		offset += 2 * 1;
-	// 	}
-	// 	offset += 2;
-
 	// 	printf("\n\n\n");
 	// 	if(params[0] == INT){
 	// 		readBufInt = (int*) malloc((2 * params[1] + 2) * sizeof(int));
@@ -239,6 +232,7 @@ int main(int argc, char** argv){
 	// 		}
 	// 	}
 	// }
+	// MPI_File_close(&saveFile);
 
 	MPI_Finalize();
 
