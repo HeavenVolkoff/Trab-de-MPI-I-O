@@ -106,8 +106,8 @@ int main(int argc, char** argv){
 	//Cria uma vista dependendo do tipo de número esoclhido pelo usuário.
 	if(params[0] == INT){
 		if(rank == 0){
-			MPI_File_set_view(saveFile, 0, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
-
+			//MPI_File_set_view(saveFile, 0, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
+			MPI_File_seek(saveFile, 0, MPI_SEEK_SET);
 			//Escreve quantos números serão escritos no arquivo.
 			MPI_File_write(saveFile, &(params[1]), 1, MPI_INT, MPI_STATUS_IGNORE);
 
@@ -115,24 +115,26 @@ int main(int argc, char** argv){
 			MPI_File_write(saveFile, &selected_type, 1, MPI_INT, MPI_STATUS_IGNORE);
 
 			//Escreve os números do buffer no arquivo.
-			MPI_File_write(saveFile, bufferInt, amount * type_size, MPI_INT, MPI_STATUS_IGNORE);
+			MPI_File_write(saveFile, bufferInt, 2 * amount, MPI_INT, MPI_STATUS_IGNORE);
 		}
 		else{
 			//offset = params[1] / nProc + ((params[1] % nProc == 0)? 0: ((rank <= params[1] % nProc)? rank : 0));
-			offset = 2 * params[1] / nProc;
-			if(params[1] % nProc != 0){
+			offset = 2 * (params[1] / nProc); //Geramos params[1] pares de números.
+			if(params[1] % nProc != 0){ //Ajusta o offset caso a divisão não seja exata.
 				offset += 2 * rank;
 			}
+			offset += 2; //Leva em conta os dois primeiros números (quantidade de pares e o tipo).
 			printf("offset = %d - from process %d\n", offset, rank);
-			MPI_File_set_view(saveFile, 2 + offset * type_size, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
+			//MPI_File_set_view(saveFile, 2 + offset * type_size, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
+			MPI_File_seek(saveFile, offset, MPI_SEEK_SET);
 			//Escreve os números do buffer no arquivo.
-			MPI_File_write(saveFile, bufferInt, amount * type_size, MPI_INT, MPI_STATUS_IGNORE);
+			MPI_File_write(saveFile, bufferInt, 2 * amount, MPI_INT, MPI_STATUS_IGNORE);
 		}
 	}
 	else{
 		if(rank == 0){
-			MPI_File_set_view(saveFile, 0, MPI_FLOAT, MPI_FLOAT, "native", MPI_INFO_NULL);
-
+			//MPI_File_set_view(saveFile, 0, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
+			MPI_File_seek(saveFile, 0, MPI_SEEK_SET);
 			//Escreve quantos números serão escritos no arquivo.
 			MPI_File_write(saveFile, &(params[1]), 1, MPI_INT, MPI_STATUS_IGNORE);
 
@@ -140,13 +142,20 @@ int main(int argc, char** argv){
 			MPI_File_write(saveFile, &selected_type, 1, MPI_INT, MPI_STATUS_IGNORE);
 
 			//Escreve os números do buffer no arquivo.
-			MPI_File_write(saveFile, bufferInt, amount * type_size, MPI_FLOAT, MPI_STATUS_IGNORE);
+			MPI_File_write(saveFile, bufferFloat, 2 * amount, MPI_FLOAT, MPI_STATUS_IGNORE);
 		}
 		else{
-			offset = params[1] / nProc + ((params[1] % nProc == 0)? 0: ((rank <= params[1] % nProc)? rank : 0));
-			MPI_File_set_view(saveFile, 2 + offset * type_size, MPI_FLOAT, MPI_FLOAT, "native", MPI_INFO_NULL);
+			//offset = params[1] / nProc + ((params[1] % nProc == 0)? 0: ((rank <= params[1] % nProc)? rank : 0));
+			offset = 2 * (params[1] / nProc); //Geramos params[1] pares de números.
+			if(params[1] % nProc != 0){ //Ajusta o offset caso a divisão não seja exata.
+				offset += 2 * rank;
+			}
+			offset += 2; //Leva em conta os dois primeiros números (quantidade de pares e o tipo).
+			printf("offset = %d - from process %d\n", offset, rank);
+			//MPI_File_set_view(saveFile, 2 + offset * type_size, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
+			MPI_File_seek(saveFile, offset, MPI_SEEK_SET);
 			//Escreve os números do buffer no arquivo.
-			MPI_File_write(saveFile, bufferFloat, amount * type_size, MPI_FLOAT, MPI_STATUS_IGNORE);
+			MPI_File_write(saveFile, bufferFloat, 2 * amount, MPI_FLOAT, MPI_STATUS_IGNORE);
 		}
 	}
 	
