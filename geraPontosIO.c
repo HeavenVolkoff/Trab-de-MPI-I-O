@@ -126,7 +126,7 @@ int main(int argc, char** argv){
 			offset += 2; //Leva em conta os dois primeiros números (quantidade de pares e o tipo).
 			printf("offset = %d - from process %d\n", offset, rank);
 			//MPI_File_set_view(saveFile, 2 + offset * type_size, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
-			MPI_File_seek(saveFile, offset, MPI_SEEK_SET);
+			MPI_File_seek(saveFile, offset * type_size, MPI_SEEK_SET);
 			//Escreve os números do buffer no arquivo.
 			MPI_File_write(saveFile, bufferInt, 2 * amount, MPI_INT, MPI_STATUS_IGNORE);
 		}
@@ -153,7 +153,7 @@ int main(int argc, char** argv){
 			offset += 2; //Leva em conta os dois primeiros números (quantidade de pares e o tipo).
 			printf("offset = %d - from process %d\n", offset, rank);
 			//MPI_File_set_view(saveFile, 2 + offset * type_size, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
-			MPI_File_seek(saveFile, offset, MPI_SEEK_SET);
+			MPI_File_seek(saveFile, offset * type_size, MPI_SEEK_SET);
 			//Escreve os números do buffer no arquivo.
 			MPI_File_write(saveFile, bufferFloat, 2 * amount, MPI_FLOAT, MPI_STATUS_IGNORE);
 		}
@@ -164,12 +164,19 @@ int main(int argc, char** argv){
 	//=============================================================================
 	MPI_File_open(MPI_COMM_WORLD, "pontos.txt", MPI_MODE_RDONLY, MPI_INFO_NULL, &saveFile);
 	if(rank == 0){
+		offset = 2 * (params[1] / nProc); //Geramos params[1] pares de números.
+		if(params[1] % nProc != 0){ //Ajusta o offset caso a divisão não seja exata.
+			offset += 2 * 1;
+		}
+		offset += 2;
+
 		printf("\n\n\n");
 		if(params[0] == INT){
 			readBufInt = (int*) malloc((2 * params[1] + 2) * sizeof(int));
 			MPI_File_read(saveFile, readBufInt, 2 * params[1] + 2, MPI_INT, MPI_STATUS_IGNORE);
 			for(i = 0; i < 2 * params[1] + 2; i++){
 				printf("Read %d - from process %d\n", readBufInt[i], rank);
+				readBufInt[i] = -1;
 			}
 		}
 		else{
