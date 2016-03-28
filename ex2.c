@@ -51,14 +51,14 @@ int main(int argc, char* argv[]){
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
 
-    if(MPI_File_set_view(fh, (MPI_Offset) (rank * 2 * sizeof(int)), MPI_INT, fileType, "native", MPI_INFO_NULL)){
-        //Failed Setting file view file
-        MPI_Abort(MPI_COMM_WORLD, -2);
-    }
-
     if(MPI_File_read_ordered(fh, buf, NUMBERS_PER_PROCESS, MPI_INT, &status)){
         //Failed reading file
         MPI_Abort(MPI_COMM_WORLD, -4);
+    }
+
+    if(MPI_File_set_view(fh, (MPI_Offset) (rank * 2 * sizeof(int)), MPI_INT, fileType, "native", MPI_INFO_NULL)){
+        //Failed Setting file view file
+        MPI_Abort(MPI_COMM_WORLD, -2);
     }
 
     //=========== WRITE ===========
