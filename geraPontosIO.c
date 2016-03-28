@@ -115,7 +115,7 @@ int main(int argc, char** argv){
 			bufferInt[i] = rand() % (rand() % 1000 + 1);
 			bufferInt[i + 1] = ANGULAR_COEFICIENT * bufferInt[i] + LINEAR_COEFICIENT + (rand()%7);
 			if(verbose){
-				printf("made %d = 2 * %d + 5 - form process %d\n", bufferInt[i + 1], bufferInt[i], rank);
+				printf("made %d = 2 * %d + 5 - from process %d\n", bufferInt[i + 1], bufferInt[i], rank);
 			}
 		}
 	}
@@ -126,7 +126,7 @@ int main(int argc, char** argv){
 			bufferFloat[i] = bufferFloat[i] + ((float)bufferFloat[i+1] / 1000.0);
 			bufferFloat[i + 1] = ANGULAR_COEFICIENT * bufferFloat[i] + LINEAR_COEFICIENT + (rand()%7);
 			if(verbose){
-				printf("made %f = 2 * %f + 5 - form process %d\n", bufferFloat[i + 1], bufferFloat[i], rank);	
+				printf("made %f = 2 * %f + 5 - from process %d\n", bufferFloat[i + 1], bufferFloat[i], rank);	
 			}
 		}
 	}
@@ -157,7 +157,7 @@ int main(int argc, char** argv){
 			if(verbose){
 				printf("offset = %d - from process %d\n", offset, rank);	
 			}
-			//MPI_File_set_view(saveFile, 2 + offset * type_size, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
+			
 			MPI_File_seek(saveFile, offset * file_type_size, MPI_SEEK_SET);
 			//Escreve os números do buffer no arquivo.
 			MPI_File_write(saveFile, bufferInt, 2 * amount, MPI_INT, MPI_STATUS_IGNORE);
@@ -166,7 +166,7 @@ int main(int argc, char** argv){
 	else{
 		MPI_Type_size(MPI_FLOAT, &file_type_size);
 		if(rank == 0){
-			//MPI_File_set_view(saveFile, 0, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
+			
 			MPI_File_seek(saveFile, 0, MPI_SEEK_SET);
 			//Escreve quantos números serão escritos no arquivo.
 			if(verbose){

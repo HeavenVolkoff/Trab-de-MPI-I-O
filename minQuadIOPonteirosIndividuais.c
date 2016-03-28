@@ -13,7 +13,7 @@ int min(int a, int b){
 }
 
 int main(int argc, char** argv){
-	int rank, nProc, i, file_type_size, offset;
+	int rank, nProc, i, file_type_size, size_int, offset;
 	float mySUMx = 0, mySUMy = 0, mySUMxy = 0, mySUMxx = 0;
 	float totalSUMx = 0, totalSUMy = 0, totalSUMxy = 0, totalSUMxx = 0;
 	float slope, y_intercept;
@@ -62,9 +62,9 @@ int main(int argc, char** argv){
 	if(params[0] % nProc != 0){ //Ajusta o offset caso a divisão não seja exata.
 		offset += 2 * min(rank, params[0] % nProc);
 	}
-	offset += 2; //Leva em conta os dois primeiros números (quantidade de pares e o tipo).
 
 	if(params[1] == INT){
+		offset += 2; //Leva em conta os dois primeiros números (quantidade de pares e o tipo).
 		readBufInt = (int*) malloc((2 * params[0]) * sizeof(int));
 		MPI_Type_size(MPI_INT, &file_type_size);
 		MPI_File_seek(saveFile, offset * file_type_size, MPI_SEEK_SET);
@@ -87,8 +87,9 @@ int main(int argc, char** argv){
 	}
 	else{
 		readBufFloat = (float*) malloc((2 * params[0]) * sizeof(float));
-		MPI_Type_size(MPI_INT, &file_type_size);
-		MPI_File_seek(saveFile, offset * file_type_size, MPI_SEEK_SET);
+		MPI_Type_size(MPI_INT, &size_int);
+		MPI_Type_size(MPI_FLOAT, &file_type_size);
+		MPI_File_seek(saveFile, (2 * size_int) + offset * file_type_size, MPI_SEEK_SET);
 		MPI_File_read(saveFile, readBufFloat, 2 * amount, MPI_FLOAT, MPI_STATUS_IGNORE);
 		
 		if(verbose){
